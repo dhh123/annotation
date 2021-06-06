@@ -118,9 +118,13 @@ func  getIPFromAnnotation(kubeconfig string, args *skel.CmdArgs) (*current.Resul
         PodName, _ := cniArgs[K8S_POD_NAME]
 	printOnce := false
         //config, err := rest.InClusterConfig()
-        if kubeconfig != nil {
-        	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-            client, err := kubernetes.NewForConfig(config)
+        config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+        if err != nil {
+	     return nil,err
+        }
+        client, err := kubernetes.NewForConfig(config)
+        if err != nil {
+	     return nil,err
         }
         logOnStderr(fmt.Errorf("get pods init configxxxxxxxxxxxxxxxxxxxxxx",err))
         logOnStderr(fmt.Errorf("get pods init configxxxxxxxxxxxxxxxxxxxxxx",err))
@@ -141,7 +145,7 @@ func  getIPFromAnnotation(kubeconfig string, args *skel.CmdArgs) (*current.Resul
 		}
 		return true, nil
 	}); err != nil {
-		return nil, fmt.Errorf("failed to get pod %s_%s: %v", PodName, namespace, err)
+		return nil, fmt.Errorf("failed to get pod %s_%s: %v", PodName, PodNamespace, err)
 	}
         if err != nil {
                 return nil,err
