@@ -160,8 +160,13 @@ func  GetIPFromAnnotation(kubeconfig string, args *skel.CmdArgs) (*current.Resul
                 }
                 logOnStderr(fmt.Errorf("getpod2xxxxxxxxxxxxxxxxxxxxxxargs",k, v))
         }
-	   newResult := IPInfoToResult(infos)
-       return newResult, nil
+		if len(infos) == 0 {
+        	return nil, nil
+		} else {
+	        newResult := IPInfoToResult(infos)
+            return newResult, nil
+
+		}
 }
 
 func logOnStderr(err error) {
