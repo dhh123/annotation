@@ -108,7 +108,7 @@ func ParseCNIArgs(args string) (map[string]string, error) {
         return kvMap, nil
 }
 
-func  getIPFromAnnotation(kubeconfig string, args *skel.CmdArgs) (*current.Result, error) {
+func  GetIPFromAnnotation(kubeconfig string, args *skel.CmdArgs) (*current.Result, error) {
 	var pod *corev1.Pod
         cniArgs, err := ParseCNIArgs(args.Args)
         if err != nil {
