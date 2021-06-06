@@ -108,7 +108,7 @@ func ParseCNIArgs(args string) (map[string]string, error) {
         return kvMap, nil
 }
 
-func  getIPFromAnnotation(kubeconfig, args *skel.CmdArgs) (*current.Result, error) {
+func  getIPFromAnnotation(kubeconfig string, args *skel.CmdArgs) (*current.Result, error) {
 	var pod *corev1.Pod
         cniArgs, err := ParseCNIArgs(args.Args)
         if err != nil {
@@ -120,15 +120,15 @@ func  getIPFromAnnotation(kubeconfig, args *skel.CmdArgs) (*current.Result, erro
         //config, err := rest.InClusterConfig()
         if kubeconfig != nil {
         	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+            client, err := kubernetes.NewForConfig(config)
         }
         logOnStderr(fmt.Errorf("get pods init configxxxxxxxxxxxxxxxxxxxxxx",err))
-        client, err := kubernetes.NewForConfig(config)
         logOnStderr(fmt.Errorf("get pods init configxxxxxxxxxxxxxxxxxxxxxx",err))
         if err != nil {
 	     return nil,err
         }
 	if err := wait.PollImmediate(time.Millisecond*500, 5*time.Second, func() (done bool, err error) {
-		pod, err = client.CoreV1().Pods(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+		pod, err = client.CoreV1().Pods(PodNamespace).Get(context.TODO(), PodName, metav1.GetOptions{})
 		if err != nil {
 			if errors.IsNotFound(err) {
 				if printOnce == false {
@@ -141,7 +141,7 @@ func  getIPFromAnnotation(kubeconfig, args *skel.CmdArgs) (*current.Result, erro
 		}
 		return true, nil
 	}); err != nil {
-		return nil, fmt.Errorf("failed to get pod %s_%s: %v", name, namespace, err)
+		return nil, fmt.Errorf("failed to get pod %s_%s: %v", PodName, namespace, err)
 	}
         if err != nil {
                 return nil,err
@@ -156,7 +156,7 @@ func  getIPFromAnnotation(kubeconfig, args *skel.CmdArgs) (*current.Result, erro
                 }
                 logOnStderr(fmt.Errorf("getpod2xxxxxxxxxxxxxxxxxxxxxxargs",k, v))
         }
-       newResult = IPInfoToResult(infos)
+	   newResult := IPInfoToResult(infos)
        return newResult, nil
 }
 
