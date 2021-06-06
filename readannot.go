@@ -1,7 +1,6 @@
 package annotation
 
 import (
-	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"net"
