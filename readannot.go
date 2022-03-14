@@ -139,7 +139,7 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
-	var floatResp = api.ListIPResp
+	var floatResp := api.ListIPResp
 	err = json.NewDecoder(respR.Body).Decode(&ListIPResp)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
