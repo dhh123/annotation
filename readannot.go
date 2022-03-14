@@ -190,7 +190,7 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 	Result := &current.Result{}
 	Result.IPs = []*current.IPConfig{
 		Version: "4",
-		Address: &net.IPNet{IP: floatResp.Content[0].IP, Mask: net.IPv4Mask(255.255.255.255)}}
+		Address: &net.IPNet{IP: floatResp.Content[0].IP, Mask: net.IPv4Mask(255,255,255,255)}}
 	return Result, err
 
 }
