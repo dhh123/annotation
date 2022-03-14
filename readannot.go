@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	//"github.com/containernetworking/plugins/pkg/ipam"
@@ -19,11 +20,42 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"tkestack.io/galaxy/pkg/ipam/api"
+	"tkestack.io/galaxy/pkg/api/galaxy/constant"
+	"tkestack.io/galaxy/pkg/utils/nets"
+	pageutil "tkestack.io/galaxy/pkg/utils/page"
 )
+
+// FloatingIP defines a floating ip
+type FloatingIP struct {
+	Key               string
+	IP                net.IP
+	UpdatedAt         time.Time
+	Labels            map[string]string
+	Policy            uint16
+	NodeName          string
+	PodUid            string
+	pool              *FloatingIPPool
+	AssignIp          constant.AssignIp
+	NetType           string
+	Namespace         string
+	Mask              string
+	AllocateNamespace string
+}
+type FloatingIPPool struct {
+	NodeSubnets []*net.IPNet // the node subnets
+	nets.SparseSubnet
+	sync.RWMutex
+	nodeSubnets sets.String // the node subnets, string set format
+	index       int         // the index of []FloatingIPPool
+}
+type ListIPResp struct {
+	pageutil.Page
+	Content []FloatingIP `json:"content,omitempty"`
+}
 
 const (
 	K8S_POD_NAMESPACE          = "K8S_POD_NAMESPACE"
@@ -140,7 +172,7 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
-	floatResp := api.ListIPResp
+	floatResp := new(ListIPResp)
 	err = json.NewDecoder(respR.Body).Decode(&floatResp)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
