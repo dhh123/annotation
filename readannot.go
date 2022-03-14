@@ -24,27 +24,27 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"tkestack.io/galaxy/pkg/api/galaxy/constant"
 	"tkestack.io/galaxy/pkg/utils/nets"
 	pageutil "tkestack.io/galaxy/pkg/utils/page"
 )
 
-// FloatingIP defines a floating ip
+// FloatingIP is the floating ip info
 type FloatingIP struct {
-	Key               string
-	IP                net.IP
-	UpdatedAt         time.Time
-	Labels            map[string]string
-	Policy            uint16
-	NodeName          string
-	PodUid            string
-	pool              *FloatingIPPool
-	AssignIp          constant.AssignIp
-	NetType           string
-	Namespace         string
-	Mask              string
-	AllocateNamespace string
+	IP                string            `json:"ip"`
+	Namespace         string            `json:"namespace,omitempty"`
+	AppName           string            `json:"appName,omitempty"`
+	PodName           string            `json:"podName,omitempty"`
+	PoolName          string            `json:"poolName,omitempty"`
+	Policy            uint16            `json:"policy"`
+	AppType           string            `json:"appType,omitempty"`
+	UpdateTime        time.Time         `json:"updateTime,omitempty"`
+	Status            string            `json:"status,omitempty"`
+	Releasable        bool              `json:"releasable,omitempty"`
+	labels            map[string]string `json:"-"`
+	NetType           string            `json:"netType,omitempty"`
+	AllocateNamespace string            `json:"allocateNamespace,omitempty"`
 }
+
 type FloatingIPPool struct {
 	NodeSubnets []*net.IPNet // the node subnets
 	nets.SparseSubnet
