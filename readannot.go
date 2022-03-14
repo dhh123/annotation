@@ -113,7 +113,7 @@ func ParseCNIArgs(args string) (map[string]string, error) {
 	}
 	return kvMap, nil
 }
-func (client *weaveapi.Client) GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
+func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 	// := url.values{}
 	//v.set("huifu", "hello world")
 	//body := ioutil.nopcloser(strings.newreader(v.encode())) //把form数据编下码
@@ -131,26 +131,26 @@ func (client *weaveapi.Client) GetIpFromGalaxy(args *skel.CmdArgs) (*current.Res
 	params.Add("namespace", "default")
 	params.Add("netType", "overlay")
 	params.Add("nodeip", string(GetOutboundIP())+"/32")
-	params.Add("page", 1)
-	params.Add("size", 1)
-	requestUrlR := fmt.Sprintf(client.baseURL + "/v1/available/ip?" + params.Encode())
+	params.Add("page", "1")
+	params.Add("size", "1")
+	requestUrlR := fmt.Sprintf(GalaxyUrl + "/v1/available/ip?" + params.Encode())
 	//curl 'http://172.16.8.195:9041/v1/allocation/ip?namespace=default&netType=overlay&ip=10.100.0.102&cid=weave-expose
 	respR, err := http.Get(requestUrlR)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
-	params := url.Values{}
+	var floatResp = api.ListIPResp
+	err = json.NewDecoder(respR.Body).Decode(&ListIPResp)
+	if err != nil {
+		logOnStderr(fmt.Errorf("get ip", err))
+	}
+	params = url.Values{}
 	params.Add("namespace", "default")
 	params.Add("netType", "overlay")
 	params.Add("ip", floatResp.Content.IP)
 	params.Add("cid", args.ContainerID)
 	requestUrlS := fmt.Sprintf(client.baseURL + "/v1/allocation/ip?" + params.Encode())
 	respS, err := http.Get(requestUrlS)
-	if err != nil {
-		logOnStderr(fmt.Errorf("get ip", err))
-	}
-	var floatResp = api.ListIPResp
-	err = json.NewDecoder(respR.Body).Decode(&ListIPResp)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
