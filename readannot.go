@@ -183,7 +183,7 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 	params.Add("ip", floatResp.Content[0].IP)
 	params.Add("cid", args.ContainerID)
 	requestUrlS := fmt.Sprintf(GalaxyUrl + "/v1/allocation/ip?" + params.Encode())
-	respS, err := http.Get(requestUrlS)
+	_, err := http.Get(requestUrlS)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
