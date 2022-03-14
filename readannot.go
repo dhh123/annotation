@@ -180,7 +180,7 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 	params = url.Values{}
 	params.Add("namespace", "default")
 	params.Add("netType", "overlay")
-	params.Add("ip", floatResp.Content.IP)
+	params.Add("ip", floatResp.Content[0].IP)
 	params.Add("cid", args.ContainerID)
 	requestUrlS := fmt.Sprintf(GalaxyUrl + "/v1/allocation/ip?" + params.Encode())
 	respS, err := http.Get(requestUrlS)
@@ -188,9 +188,9 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
 	Result := &current.Result{}
-	Result.IPs = []*current.IPConfig{
+	Result.IPs = []&current.IPConfig{
 		Version: "4",
-		Address: &net.IPNet{IP: floatResp.Content.IP, Mask: 32}}
+		Address: &net.IPNet{IP: floatResp.Content[0].IP, Mask: net.IPv4Mask(255.255.255.255)}}
 	return Result, err
 
 }
