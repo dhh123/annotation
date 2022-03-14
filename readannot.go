@@ -22,6 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"tkestack.io/galaxy/pkg/ipam/api"
 )
 
 const (
@@ -140,7 +141,7 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
 	floatResp := api.ListIPResp
-	err = json.NewDecoder(respR.Body).Decode(&ListIPResp)
+	err = json.NewDecoder(respR.Body).Decode(&floatResp)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
@@ -149,13 +150,15 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 	params.Add("netType", "overlay")
 	params.Add("ip", floatResp.Content.IP)
 	params.Add("cid", args.ContainerID)
-	requestUrlS := fmt.Sprintf(client.baseURL + "/v1/allocation/ip?" + params.Encode())
+	requestUrlS := fmt.Sprintf(GalaxyUrl + "/v1/allocation/ip?" + params.Encode())
 	respS, err := http.Get(requestUrlS)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
 	Result := &current.Result{}
-	Result.IPs = []*current.IPConfig{Version: "4", Address: &net.IPNet{IP: floatResp.Content.IP, Mask: 32}}
+	Result.IPs = []*current.IPConfig{
+		Version: "4",
+		Address: &net.IPNet{IP: floatResp.Content.IP, Mask: 32}}
 	return Result, err
 
 }
