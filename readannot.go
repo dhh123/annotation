@@ -69,8 +69,8 @@ const (
 )
 
 type AlllocateResult struct {
-	Code  string
-    Message  string
+	Code    string
+	Message string
 }
 
 type NetworkInfo struct {
@@ -191,8 +191,7 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 
 }
 
-
-function GetOrAllcateNodeIP(cid string) (*current.Result, error) {
+func GetOrAllcateNodeIP(cid string) (*current.Result, error) {
 	hname, err := os.Hostname()
 	if err != nil {
 		logOnStderr(fmt.Errorf("gethostname-error", err))
