@@ -196,19 +196,19 @@ func GetOrAllcateNodeIP(cid string) (*current.Result, error) {
 	if err != nil {
 		logOnStderr(fmt.Errorf("gethostname-error", err))
 	}
-	params = url.Values{}
+	params := url.Values{}
 	params.Add("namespace", "default")
 	params.Add("netType", "overlay")
 	params.Add("cid", cid)
 	params.Add("hostname", hname)
 	params.Add("nodeip", string(GetOutboundIP())+"/32")
 	requestUrlS := fmt.Sprintf(GalaxyUrl + "/v1/checkorallocatenodeip/ip?" + params.Encode())
-	resultS, err = http.Get(requestUrlS)
+	resultS, err := http.Get(requestUrlS)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
 	ipResp := new(AlllocateResult)
-	err = json.NewDecoder(respS.Body).Decode(&ipResp)
+	err = json.NewDecoder(resultS.Body).Decode(&ipResp)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
@@ -216,7 +216,7 @@ func GetOrAllcateNodeIP(cid string) (*current.Result, error) {
 	Result.IPs = []*current.IPConfig{
 		{
 			Version: "4",
-			Address: net.IPNet{IP: net.ParseIP(ipResp.message), Mask: net.IPv4Mask(255, 255, 255, 255)},
+			Address: net.IPNet{IP: net.ParseIP(ipResp.Message), Mask: net.IPv4Mask(255, 255, 255, 255)},
 		},
 	}
 	return Result, err
