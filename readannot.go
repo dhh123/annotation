@@ -68,6 +68,11 @@ const (
 	GalaxyUrl                  = "http://galaxy-ipam.kube-system:9041"
 )
 
+type AlllocateResult struct {
+	Code  string
+    Message  string
+}
+
 type NetworkInfo struct {
 	NetworkType string
 	Args        map[string]string
@@ -146,20 +151,8 @@ func ParseCNIArgs(args string) (map[string]string, error) {
 	}
 	return kvMap, nil
 }
+
 func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
-	// := url.values{}
-	//v.set("huifu", "hello world")
-	//body := ioutil.nopcloser(strings.newreader(v.encode())) //把form数据编下码
-	//clienvt := &http.client{}
-	//req, _ := http.newrequest("post", galaxyurl, body)
-
-	//req.header.set("content-type", "application/x-www-form-urlencoded; param=value") //这个一定要加，不加form的值post不过去，被坑了两小时
-	//fmt.printf("%+v\n", req)                                                         //看下发送的结构
-
-	//resp, err := client.do(req) //发送
-	//defer resp.body.close()     //一定要关闭resp.body
-	//data, _ := ioutil.readall(resp.body)
-	//fmt.println(string(data), err)
 	params := url.Values{}
 	params.Add("namespace", "default")
 	params.Add("netType", "overlay")
@@ -167,7 +160,7 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 	params.Add("page", "1")
 	params.Add("size", "1")
 	requestUrlR := fmt.Sprintf(GalaxyUrl + "/v1/available/ip?" + params.Encode())
-	//curl 'http://172.16.8.195:9041/v1/allocation/ip?namespace=default&netType=overlay&ip=10.100.0.102&cid=weave-expose
+	//curl 'xxxx:xxxx/v1/allocation/ip?namespace=default&netType=overlay&ip=10.100.0.102&cid=weave-expose
 	respR, err := http.Get(requestUrlR)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
@@ -189,14 +182,48 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 	}
 	Result := &current.Result{}
 	Result.IPs = []*current.IPConfig{
-    {
+		{
 			Version: "4",
-			Address: net.IPNet{IP: net.ParseIP(floatResp.Content[0].IP), Mask: net.IPv4Mask(255,255,255,255)},
+			Address: net.IPNet{IP: net.ParseIP(floatResp.Content[0].IP), Mask: net.IPv4Mask(255, 255, 255, 255)},
 		},
 	}
 	return Result, err
 
 }
+
+
+function GetOrAllcateNodeIP(cid string) (*current.Result, error) {
+	hname, err := os.Hostname()
+	if err != nil {
+		logOnStderr(fmt.Errorf("gethostname-error", err))
+	}
+	params = url.Values{}
+	params.Add("namespace", "default")
+	params.Add("netType", "overlay")
+	params.Add("cid", cid)
+	params.Add("hostname", hname)
+	params.Add("nodeip", string(GetOutboundIP())+"/32")
+	requestUrlS := fmt.Sprintf(GalaxyUrl + "/v1/checkorallocatenodeip/ip?" + params.Encode())
+	resultS, err = http.Get(requestUrlS)
+	if err != nil {
+		logOnStderr(fmt.Errorf("get ip", err))
+	}
+	ipResp := new(AlllocateResult)
+	err = json.NewDecoder(respS.Body).Decode(&ipResp)
+	if err != nil {
+		logOnStderr(fmt.Errorf("get ip", err))
+	}
+	Result := &current.Result{}
+	Result.IPs = []*current.IPConfig{
+		{
+			Version: "4",
+			Address: net.IPNet{IP: net.ParseIP(ipResp.message), Mask: net.IPv4Mask(255, 255, 255, 255)},
+		},
+	}
+	return Result, err
+
+}
+
 func GetOutboundIP() net.IP {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
