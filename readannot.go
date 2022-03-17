@@ -212,7 +212,7 @@ func GetOrAllcateNodeIP(cid string) (*current.Result, error) {
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
-	address, err := net.ParseCIDR(ipResp.Message)
+	_, address, err := net.ParseCIDR(ipResp.Message)
 	Result := &current.Result{}
 	Result.IPs = []*current.IPConfig{
 		{
