@@ -217,7 +217,7 @@ func GetOrAllcateNodeIP(cid string) (*current.Result, error) {
 	Result.IPs = []*current.IPConfig{
 		{
 			Version: "4",
-			Address: address,
+			Address: net.IPnet(&address),
 		},
 	}
 	return Result, err
