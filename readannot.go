@@ -191,7 +191,7 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 
 }
 
-func GetOrAllcateNodeIP(cid string) (*current.Result, error) {
+func GetOrAllcateNodeIP(cid string, GalaxyUrl string) (*current.Result, error) {
 	logOnStderr(fmt.Errorf("get ip start from galaxy ", cid))
 	hname, err := os.Hostname()
 	if err != nil {
