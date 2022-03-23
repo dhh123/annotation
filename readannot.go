@@ -65,7 +65,6 @@ const (
 
 	stateDir                   = "/var/lib/cni/galaxy/port"
 	PortMappingPortsAnnotation = "tkestack.io/portmapping"
-	GalaxyUrl                  = "http://" + os.Getenv("GALAXY_ADDR") 
 )
 
 type AlllocateResult struct {
@@ -150,45 +149,6 @@ func ParseCNIArgs(args string) (map[string]string, error) {
 		kvMap[strings.TrimSpace(part[0])] = strings.TrimSpace(part[1])
 	}
 	return kvMap, nil
-}
-
-func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
-	params := url.Values{}
-	params.Add("namespace", "default")
-	params.Add("netType", "overlay")
-	params.Add("nodeip", string(GetOutboundIP())+"/32")
-	params.Add("page", "1")
-	params.Add("size", "1")
-	requestUrlR := fmt.Sprintf(GalaxyUrl + "/v1/available/ip?" + params.Encode())
-	//curl 'xxxx:xxxx/v1/allocation/ip?namespace=default&netType=overlay&ip=10.100.0.102&cid=weave-expose
-	respR, err := http.Get(requestUrlR)
-	if err != nil {
-		logOnStderr(fmt.Errorf("get ip", err))
-	}
-	floatResp := new(ListIPResp)
-	err = json.NewDecoder(respR.Body).Decode(&floatResp)
-	if err != nil {
-		logOnStderr(fmt.Errorf("get ip", err))
-	}
-	params = url.Values{}
-	params.Add("namespace", "default")
-	params.Add("netType", "overlay")
-	params.Add("ip", floatResp.Content[0].IP)
-	params.Add("cid", args.ContainerID)
-	requestUrlS := fmt.Sprintf(GalaxyUrl + "/v1/allocation/ip?" + params.Encode())
-	_, err = http.Get(requestUrlS)
-	if err != nil {
-		logOnStderr(fmt.Errorf("get ip", err))
-	}
-	Result := &current.Result{}
-	Result.IPs = []*current.IPConfig{
-		{
-			Version: "4",
-			Address: net.IPNet{IP: net.ParseIP(floatResp.Content[0].IP), Mask: net.IPv4Mask(255, 255, 255, 255)},
-		},
-	}
-	return Result, err
-
 }
 
 func GetOrAllcateNodeIP(cid string, GalaxyUrl string) (*current.Result, error) {
