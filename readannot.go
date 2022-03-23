@@ -65,7 +65,7 @@ const (
 
 	stateDir                   = "/var/lib/cni/galaxy/port"
 	PortMappingPortsAnnotation = "tkestack.io/portmapping"
-	GalaxyUrl                  = "http://galaxy-ipam.kube-system:9041"
+	GalaxyUrl                  = "http://" + os.Getenv("GALAXY_ADDR") 
 )
 
 type AlllocateResult struct {
