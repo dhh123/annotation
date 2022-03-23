@@ -192,6 +192,7 @@ func GetIpFromGalaxy(args *skel.CmdArgs) (*current.Result, error) {
 }
 
 func GetOrAllcateNodeIP(cid string) (*current.Result, error) {
+	logOnStderr(fmt.Errorf("get ip start from galaxy ", cid))
 	hname, err := os.Hostname()
 	if err != nil {
 		logOnStderr(fmt.Errorf("gethostname-error", err))
@@ -220,6 +221,7 @@ func GetOrAllcateNodeIP(cid string) (*current.Result, error) {
 			Address: net.IPNet(*address),
 		},
 	}
+	logOnStderr(fmt.Errorf("got ip from galaxy", Result, err))
 	return Result, err
 
 }
@@ -300,3 +302,4 @@ func GetIPFromAnnotation(kubeconfig string, args *skel.CmdArgs) (*current.Result
 func logOnStderr(err error) {
 	fmt.Fprintln(os.Stderr, "weave-cni:", err)
 }
+
