@@ -175,11 +175,12 @@ func GetOrAllcateNodeIP(cid string, GalaxyUrl string) (*current.Result, error) {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
 	_, address, err := net.ParseCIDR(ipResp.Message)
+	logOnStderr(fmt.Errorf("get exposeip ip:", *address))
 	Result := &current.Result{}
 	Result.IPs = []*current.IPConfig{
 		{
 			Version: "4",
-			Address: net.IPNet(*address),
+			Address: *address,
 		},
 	}
 	logOnStderr(fmt.Errorf("got ip from galaxy", Result, err))
