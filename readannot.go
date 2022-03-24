@@ -152,7 +152,6 @@ func ParseCNIArgs(args string) (map[string]string, error) {
 }
 
 func GetOrAllcateNodeIP(cid string, GalaxyUrl string) (*current.Result, error) {
-	logOnStderr(fmt.Errorf("get ip start from galaxy ", cid))
 	hname, err := os.Hostname()
 	if err != nil {
 		logOnStderr(fmt.Errorf("gethostname-error", err))
@@ -166,10 +165,12 @@ func GetOrAllcateNodeIP(cid string, GalaxyUrl string) (*current.Result, error) {
 	params.Add("nodeip", fmt.Sprintf("%s/32", ip))
 	requestUrlS := fmt.Sprintf("http://" + GalaxyUrl + "/v1/checkorallocatenodeip/ip?" + params.Encode())
 	resultS, err := http.Get(requestUrlS)
+	logOnStderr(fmt.Errorf("get ip start from galaxy ", cid, GalaxyUrl, requestUrlS, resultS))
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
 	}
-	ipResp := new(AlllocateResult)
+	var ipResp AlllocateResult
+	logOnStderr(fmt.Errorf("get ip start from galaxy ", cid, GalaxyUrl, requestUrlS, resultS.Body))
 	err = json.NewDecoder(resultS.Body).Decode(&ipResp)
 	if err != nil {
 		logOnStderr(fmt.Errorf("get ip", err))
