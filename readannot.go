@@ -183,7 +183,7 @@ func GetOrAllcateNodeIP(cid string, GalaxyUrl string) (*current.Result, error) {
 			Version: "4",
 			Address: net.IPNet{
 				IP:   ip,
-				Mask: netM.Mask
+				Mask: netM.Mask,
 			},
 		},
 	}
