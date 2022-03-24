@@ -68,7 +68,7 @@ const (
 )
 
 type AlllocateResult struct {
-	Code    string
+	Code    int
 	Message string
 }
 
@@ -163,7 +163,7 @@ func GetOrAllcateNodeIP(cid string, GalaxyUrl string) (*current.Result, error) {
 	params.Add("cid", cid)
 	params.Add("hostname", hname)
 	ip := GetOutboundIP()
-	params.Add("nodeip", fmt.Sprintf("%s/32",ip))
+	params.Add("nodeip", fmt.Sprintf("%s/32", ip))
 	requestUrlS := fmt.Sprintf("http://" + GalaxyUrl + "/v1/checkorallocatenodeip/ip?" + params.Encode())
 	resultS, err := http.Get(requestUrlS)
 	if err != nil {
@@ -263,4 +263,3 @@ func GetIPFromAnnotation(kubeconfig string, args *skel.CmdArgs) (*current.Result
 func logOnStderr(err error) {
 	fmt.Fprintln(os.Stderr, "weave-cni:", err)
 }
-
