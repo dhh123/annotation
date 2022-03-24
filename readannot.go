@@ -162,8 +162,8 @@ func GetOrAllcateNodeIP(cid string, GalaxyUrl string) (*current.Result, error) {
 	params.Add("cid", cid)
 	params.Add("hostname", hname)
 	ip := GetOutboundIP()
-	params.Add("nodeip", fmt.Sprintf("%s/32", ip))
-	requestUrlS := fmt.Sprintf("http://" + GalaxyUrl + "/v1/checkorallocatenodeip/ip?" + params.Encode())
+	params.Add("nodeip", ip+"/32")
+	requestUrlS := fmt.Sprint("http://" + GalaxyUrl + "/v1/checkorallocatenodeip/ip?" + params.Encode())
 	resultS, err := http.Get(requestUrlS)
 	logOnStderr(fmt.Errorf("get ip start from galaxy ", cid, GalaxyUrl, requestUrlS, resultS))
 	if err != nil {
